@@ -20,18 +20,20 @@
   -->
 
 <beans xmlns="http://www.springframework.org/schema/beans"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:context="http://www.springframework.org/schema/context"
-    xmlns:jee="http://www.springframework.org/schema/jee"
-    xmlns:tx="http://www.springframework.org/schema/tx"
-    xmlns:mvc="http://www.springframework.org/schema/mvc"
-    xmlns:sec="http://www.springframework.org/schema/security"
-    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:jee="http://www.springframework.org/schema/jee"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:sec="http://www.springframework.org/schema/security"
+       xmlns:security="http://www.springframework.org/schema/c" xmlns:beans="http://www.springframework.org/schema/p"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
         http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
         http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee.xsd
         http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
-        http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.2.xsd
-        http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd">
+        http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-4.2.xsd
+        http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.2.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
 
     <context:component-scan base-package="uk.ac.ebi.metabolights" />
     <context:annotation-config/>
@@ -41,10 +43,12 @@
     <mvc:annotation-driven/>
     <mvc:default-servlet-handler/>
 
-	<bean id="viewResolver"
+	<!--bean id="viewResolver"
 	    class="org.springframework.web.servlet.view.UrlBasedViewResolver">
-	    <property name="viewClass" value="org.springframework.web.servlet.view.tiles2.TilesView"/>
-	</bean>
+	    <property name="viewClass" value="org.springframework.web.servlet.view.tiles3.TilesView"/>
+	</bean-->
+    <bean id="tilesViewResolver" class="org.springframework.web.servlet.view.tiles3.TilesViewResolver">
+    </bean>
 
     <!--
     File uploading
@@ -54,15 +58,12 @@
         <!--property name="maxUploadSize" value="100000"/-->
     </bean>
 
-
-
-
     <!--
     To configure Apache Tiles, an entry for bean TilesConfigure has to be made in spring-servlet.xml.
     An input configuration file /WEB-INF/tiles.xml is passed as argument in above bean definition.
     This file contains the Tiles definition for our web application.
     -->
-    <bean id="tilesConfigurer" class="org.springframework.web.servlet.view.tiles2.TilesConfigurer">
+    <bean id="tilesConfigurer" class="org.springframework.web.servlet.view.tiles3.TilesConfigurer">
 	    <property name="definitions">
 	        <list>
 	            <value>/WEB-INF/tiles.xml</value>
@@ -89,7 +90,7 @@
 	    <property name="defaultLocale" value="en"/>
 	</bean>
 	<bean id="handlerMapping"
-	    class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping">
+	    class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping">
 	    <property name="interceptors"> <ref bean="localeChangeInterceptor" />
 	    </property>
 	</bean>
@@ -101,7 +102,7 @@
 	<bean id="contextApplicationContextProvider" class="uk.ac.ebi.metabolights.service.ApplicationContextProvider"></bean>
 
 
-    <jee:jndi-lookup id="studiesLocation"   jndi-name="java:comp/env/studiesLocation" />
+    <jee:jndi-lookup id="studiesLocation"           jndi-name="java:comp/env/studiesLocation" />
     <jee:jndi-lookup id="urlConfirmNewAccount"      jndi-name="java:comp/env/urlConfirmNewAccount" />
     <jee:jndi-lookup id="urlActivateNewAccount"     jndi-name="java:comp/env/urlActivateNewAccount" />
     <jee:jndi-lookup id="uploadDirectory"           jndi-name="java:comp/env/uploadDirectory" />
@@ -114,11 +115,11 @@
     <jee:jndi-lookup id="EBIHost"		            jndi-name="java:comp/env/EBIHost"/>
     <jee:jndi-lookup id="curationEmailAddress"		jndi-name="java:comp/env/curationEmailAddress"/>
     <jee:jndi-lookup id="BccPivotalEmailAddress"    jndi-name="java:comp/env/BccPivotalEmailAddress"/>
-    <jee:jndi-lookup id="staticHeaderFooter"    jndi-name="java:comp/env/staticHeaderFooter"/>
-    <jee:jndi-lookup id="userSpace" jndi-name="java:comp/env/userSpace"/>
-    <jee:jndi-lookup id="OrcidClaimServiceURL" jndi-name="java:comp/env/OrcidClaimServiceURL"/>
-    <jee:jndi-lookup id="OrcidLinkServiceURL" jndi-name="java:comp/env/OrcidLinkServiceURL"/>
-    <jee:jndi-lookup id="OrcidRetreiveClaimsURL" jndi-name="java:comp/env/OrcidRetreiveClaimsURL"/>
+    <jee:jndi-lookup id="staticHeaderFooter"        jndi-name="java:comp/env/staticHeaderFooter"/>
+    <jee:jndi-lookup id="userSpace"                 jndi-name="java:comp/env/userSpace"/>
+    <jee:jndi-lookup id="OrcidClaimServiceURL"      jndi-name="java:comp/env/OrcidClaimServiceURL"/>
+    <jee:jndi-lookup id="OrcidLinkServiceURL"       jndi-name="java:comp/env/OrcidLinkServiceURL"/>
+    <jee:jndi-lookup id="OrcidRetreiveClaimsURL"    jndi-name="java:comp/env/OrcidRetreiveClaimsURL"/>
 
 
     <!--  register the application properties -->
@@ -186,7 +187,6 @@
         <sec:intercept-url pattern="/mysubmissions" access="isAuthenticated()" />
         <sec:intercept-url pattern="/privatefiles" access="isAuthenticated()" />
         <sec:intercept-url pattern="/updateAccount" access="isAuthenticated()" />
-
         <sec:intercept-url pattern="/labs" access="isAuthenticated()" />
 		<sec:intercept-url pattern="/reindex" access="hasRole('ROLE_SUPER_USER')" />
         <sec:intercept-url pattern="/reindexall" access="hasRole('ROLE_SUPER_USER')" />
@@ -209,12 +209,20 @@
         <sec:intercept-url pattern="/**" access="permitAll"/>
         <sec:logout logout-success-url="/loggedout" delete-cookies="JSESSIONID" />
         <sec:form-login login-page='/login' authentication-failure-url="/login?login_error=1" default-target-url="/login-success"  />
+        <sec:cors configuration-source-ref="corsSource"/>
     </sec:http>
     <sec:authentication-manager>
         <sec:authentication-provider ref="isaTabAuthenticationProv" />
     </sec:authentication-manager>
     <bean id="isaTabAuthenticationProv" class="uk.ac.ebi.metabolights.authenticate.IsaTabAuthenticationProvider"/>
 
+    <bean id="corsSource" class="org.springframework.web.cors.UrlBasedCorsConfigurationSource" />
+
+    <mvc:cors>
+        <mvc:mapping path="/**" allowed-origins="*"
+                     allowed-headers="Content-Type, Access-Control-Allow-Origin, Access-Control-Allow-Headers, Authorization, X-Requested-With, requestId, Correlation-Id"
+                     allowed-methods="GET, PUT, POST, DELETE" />
+    </mvc:cors>
 
     <!--<jee:jndi-lookup id="mailpassword" jndi-name="java:comp/env/mailpassword"/>-->
 

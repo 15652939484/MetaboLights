@@ -30,7 +30,7 @@
     <h1></h1>
 
 	<div id="search-box">
-		<form name="searchForm"	
+		<form name="searchForm"
 		   action="<c:choose>
 		      <c:when test="${empty action}">search</c:when>
 		      <c:otherwise>search</c:otherwise>
@@ -44,26 +44,26 @@
 	</div>
 
 	<div class="loggedInAsBox">
-			<%-- <sec:authorize ifAnyGranted="ROLE_SUBMITTER">		
-			<ul id="sddm">	       		
+			<%-- <sec:authorize ifAnyGranted="ROLE_SUBMITTER">
+			<ul id="sddm">
 			  <li><a href="<spring:url value="mysubmissions"/>" onmouseover="mopen('m2')"onmouseout="mclosetime()">
 			  			<sec:authentication property="principal.firstName" /><span class="smallArrow"></span></a>
 				 <div id="m2" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">
-					<a href="<spring:url value="mysubmissions"/>"><spring:message code="menu.myStudies"/></a> 
-					<a href="<spring:url value="myAccount"/>"><spring:message code="menu.myAccount"/></a>  
-					<a href="<spring:url value="/j_spring_security_logout"/>"><spring:message code="menu.logout"/></a> 
-				 </div>  
+					<a href="<spring:url value="mysubmissions"/>"><spring:message code="menu.myStudies"/></a>
+					<a href="<spring:url value="myAccount"/>"><spring:message code="menu.myAccount"/></a>
+					<a href="<spring:url value="/j_spring_security_logout"/>"><spring:message code="menu.logout"/></a>
+				 </div>
 			   </li>
-			</ul>   
+			</ul>
 		</sec:authorize>	      	--%>
-	</div>	 
+	</div>
 
- 
+
 	<ul id="sddm">
-        <sec:authorize ifNotGranted="ROLE_SUBMITTER" >
+        <sec:authorize access="!hasAnyRole('ROLE_SUBMITTER')" >
           <li><a href="login"><spring:message code="menu.login"/><br/>&nbsp;</a></li>
         </sec:authorize>
-        <sec:authorize ifAnyGranted="ROLE_SUBMITTER">
+        <sec:authorize access="hasAnyRole('ROLE_SUBMITTER')">
 			<ul id="sddm">
 			  <%--<li><a href="<spring:url value="mysubmissions"/>" onmouseover="mopen('m2')"onmouseout="mclosetime()">--%>
                     <sec:authentication property="principal.firstName" /><span class="smallArrow"></span></a>

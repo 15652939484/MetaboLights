@@ -44,7 +44,7 @@ ${localfrontierheader}
 
 
 
-<sec:authorize ifAnyGranted="ROLE_SUBMITTER">
+<sec:authorize access="hasRole('ROLE_SUBMITTER')">
 
 	<script>
 
@@ -54,6 +54,6 @@ ${localfrontierheader}
         $loginA.attr("title", '<spring:message code= "msg.welcome"/><sec:authentication property="principal.firstName" />');
 
 
-		
+
 	</script>
 </sec:authorize>

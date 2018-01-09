@@ -19,9 +19,7 @@
   ~ Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
   -->
 
-<!DOCTYPE tiles-definitions PUBLIC
-       "-//Apache Software Foundation//DTD Tiles Configuration 2.0//EN"
-       "http://tiles.apache.org/dtds/tiles-config_2_1.dtd">
+<!DOCTYPE tiles-definitions PUBLIC "-//Apache Software Foundation//DTD Tiles Configuration 3.0//EN" "http://tiles.apache.org/dtds/tiles-config_3_0.dtd">
 
 
 <!-- Here in tiles.xml we have define a template base.definition. This layout
@@ -30,21 +28,6 @@
 
 <!--suppress ALL -->
 <tiles-definitions>
-
-	<!--<definition name="twosections.def" template="/WEB-INF/jsp/frontier/twosections.jsp">-->
-		<!--<put-attribute name="leftmenu" value="" />-->
-		<!--<put-attribute name="content" value="" />-->
-	<!--</definition>-->
-
-    <!--<definition name="twosections" extends="default">-->
-    <!--<put-attribute name="body" value="twosections.def"/>-->
-    <!--</definition>-->
-    <!--<definition name="searchResult.def" template="/WEB-INF/jsp/frontier/twosections.jsp">-->
-    <!--<put-attribute name="leftmenu" value="/WEB-INF/jsp/searchFilter.jsp" />-->
-    <!--<put-attribute name="content" value="/WEB-INF/jsp/searchResults.jsp" />-->
-    <!--</definition>-->
-
-
 
     <definition name="default" template="/WEB-INF/jsp/frontier/layout.jsp">
 		<put-attribute name="head" value="/WEB-INF/jsp/frontier/head.jsp" />
@@ -310,6 +293,5 @@
     <definition name="wsMySubmissions" extends="wsSearchResult">
         <put-attribute name="title" value="My submissions" />
     </definition>
-
 
 </tiles-definitions>

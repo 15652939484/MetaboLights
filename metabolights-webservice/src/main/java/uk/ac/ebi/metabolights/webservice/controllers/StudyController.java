@@ -20,14 +20,15 @@
 
 package uk.ac.ebi.metabolights.webservice.controllers;
 
-
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.annotations.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.swagger2.annotations.EnableSwagger2;
 import uk.ac.ebi.chebi.webapps.chebiWS.client.ChebiWebServiceClient;
 import uk.ac.ebi.chebi.webapps.chebiWS.model.ChebiWebServiceFault_Exception;
 import uk.ac.ebi.chebi.webapps.chebiWS.model.Entity;
@@ -64,6 +65,8 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.*;
 
+
+@EnableSwagger2
 @Controller
 @RequestMapping("study")
 public class StudyController extends BasicController{
@@ -196,7 +199,6 @@ public class StudyController extends BasicController{
         }
 
         RestResponse restResponse = new RestResponse();
-
         restResponse.setContent(sbf.toString());
 
         return restResponse;
@@ -234,10 +236,8 @@ public class StudyController extends BasicController{
 
 		studyDAO = getStudyDAO();
 
-
 		try {
 			List<String> studyList = studyDAO.getStudiesToGoLiveList(getUser().getApiToken(), numberOfDays);
-
 			String[] strarray = studyList.toArray(new String[0]);
 			response.setContent(strarray);
 		} catch (DAOException e) {
@@ -271,7 +271,6 @@ public class StudyController extends BasicController{
 			try {
 				updateStatus(studyIdentifier, LiteStudy.StudyStatus.PUBLIC);
 				itemLog = "Study " + studyIdentifier + " made PUBLIC.";
-
 			} catch (Exception e) {
 
 				itemLog = "Can't make " + studyIdentifier + " PUBLIC: " + e.getMessage();
@@ -290,7 +289,6 @@ public class StudyController extends BasicController{
 			if (studyList.size()== 0){
 				response.setMessage("There isn't any study due to be public today.");
 			} else {
-
 				response.setMessage("All studies were made public. See content for list.");
 			}
 		}
@@ -314,7 +312,7 @@ public class StudyController extends BasicController{
 
 		logger.info("User {} requested to update {} public release date to {}", user.getFullName(),studyIdentifier, newPublicReleaseDate);
 
-		studyDAO= getStudyDAO();
+		studyDAO = getStudyDAO();
 
 		// Update the public release date
 		studyDAO.updateReleaseDate(studyIdentifier, newPublicReleaseDate, user.getApiToken());
@@ -353,16 +351,12 @@ public class StudyController extends BasicController{
 
 		try {
 			newStatus = updateStatus(studyIdentifier, newStatus);
-
 			restResponse.setContent(true);
 			restResponse.setMessage("Status for " + studyIdentifier + " updated to " + newStatus );
-
 		} catch (Exception e) {
-
 			restResponse.setMessage("Couldn't update status for " + studyIdentifier + ": " + e.getMessage());
 			restResponse.setErr(e);
 		}
-
 
 		return restResponse;
 
@@ -388,7 +382,6 @@ public class StudyController extends BasicController{
 			studyDAO= getStudyDAO();
 			// Update the overriden validations
 			studyDAO.updateValidations(studyIdentifier, validations, user.getApiToken());
-
 
 			restResponse.setContent(true);
 			restResponse.setMessage("Validations for " + studyIdentifier + " successfully updated");
@@ -535,7 +528,21 @@ public class StudyController extends BasicController{
         return null;
     }
 
+
+    @ApiOperation(value = "getMetaboliteAnnotationFile", nickname = "getMAF")
     @RequestMapping("{studyIdentifier:" + METABOLIGHTS_ID_REG_EXP +"}/assay/{assayIndex}/jsonmaf")
+    //http://heidloff.net/article/usage-of-swagger-2-0-in-spring-boot-applications-to-document-apis/
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "Accession", value = "Study Identifier", required = true, dataType = "string", paramType = "query", defaultValue="none"),
+            @ApiImplicitParam(name = "AssayIndex", value = "Number of the assay for the requested MTBLS accession", required = true, dataType = "integer", paramType = "query", defaultValue="1")
+    })
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK", response = StudyController.class),
+            @ApiResponse(code = 400, message = "Bad Request. Server could not understand the request due to malformed syntax."),
+            @ApiResponse(code = 401, message = "Unauthorized. Access to the resource requires user authentication"),
+            @ApiResponse(code = 403, message = "Forbidden. Access to the study is not allowed for this user"),
+            @ApiResponse(code = 404, message = "Not found. The requested identifier is not valid or does not exist"),
+            @ApiResponse(code = 500, message = "Internal error")})
     @ResponseBody
     public String getMetabolitesJSON(@PathVariable("studyIdentifier") String studyIdentifier, @PathVariable("assayIndex") String assayIndex) throws DAOException {
 

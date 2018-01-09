@@ -64,7 +64,8 @@ public class DAOFactory {
 
 	}
 
-	public static DAOFactory initializeWithDataSource(String isaTabRootConfigurationFolder, String studiesFolder, DataSource dataSource, String defaultPrefix) throws DAOException {
+	public static DAOFactory initializeWithDataSource(
+	        String isaTabRootConfigurationFolder, String studiesFolder, DataSource dataSource, String defaultPrefix) throws DAOException {
 
 		initializeFields(isaTabRootConfigurationFolder, studiesFolder, defaultPrefix);
 

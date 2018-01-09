@@ -30,6 +30,10 @@ import uk.ac.ebi.metabolights.referencelayer.PostgresSqlLoader;
 
 import java.sql.Connection;
 
+/**
+ * NB! To run the ChEBI importer as a *TEST* on the EBI servers, copy the resulting class file from this code into the
+ * target folder for uk/ac/ebi/metabolights/referencelayer/importer
+ */
 public class ImporterTestsShort extends TestCase{
 
 	protected static final Logger LOGGER = LoggerFactory.getLogger(ImporterTestsShort.class);

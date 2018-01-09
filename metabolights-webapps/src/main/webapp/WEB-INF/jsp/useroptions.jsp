@@ -27,7 +27,7 @@
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css">
 
-<sec:authorize ifAnyGranted="ROLE_SUBMITTER">
+<sec:authorize access="hasAnyRole('ROLE_SUBMITTER')">
     <sec:authentication var="token" property="principal.apiToken" />
     <div class="container">
         <br><br>
@@ -62,7 +62,7 @@
                     </div>
                     <div class="col-md-3">
                         <div class="form-group">
-                            <a href="<spring:url value="/j_spring_security_logout"/>" class="btn btn-default btn-md form-control ml--noborder">
+                            <a href="<spring:url value="/logout"/>" class="btn btn-default btn-md form-control ml--noborder">
                                 <i class="fa fa-sign-out" aria-hidden="true"></i>&nbsp;
                                 <spring:message code="menu.logoutCaps" />
                             </a>
@@ -101,7 +101,7 @@
     </script>
 </sec:authorize>
 <br><br>
-<sec:authorize ifAnyGranted="ROLE_SUPER_USER">
+<sec:authorize access="hasAnyRole('ROLE_SUPER_USER')">
     <div class="container">
         <div class="panel panel-success">
             <div class="panel-heading"><spring:message code="msg.useroptionscurator" /></div>

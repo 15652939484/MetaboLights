@@ -52,7 +52,7 @@
                     <p><strong><spring:message code="msg.submHeader"/></strong></p>
                 </c:if>
 
-                <form name="loginForm" action="<c:url value='j_spring_security_check'/>" method="post">
+                <form name="loginForm" action="<c:url value='/login'/>" method="post">
 
                     <c:if test="${not empty param.login_error}">
                         <p class="error">
@@ -63,12 +63,12 @@
 
                     <div class="form-group">
                         <label><spring:message code="label.email" /></label>
-                        <input class="form-control" type='text' name='j_username'/>
+                        <input class="form-control" type='text' name='username'/>
                     </div>
 
                     <div class="form-group">
                         <label><spring:message code="label.password" /></label>
-                        <input class="form-control" type='password' name='j_password'/>
+                        <input class="form-control" type='password' name='password'/>
                     </div>
 
                     <div class="form-group">
@@ -76,6 +76,8 @@
                         <input name="submit" type="submit" class="submit" value="<spring:message code="label.login"/>">
                         <input name="cancel" type="button" class="submit cancel" value="<spring:message code="label.cancel"/>" onclick="location.href='index'">
                     </div>
+
+                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
 
                 </form>
                         </div>

@@ -31,7 +31,7 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
         http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
         http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee.xsd
-        http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd
+        http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.2.xsd
         http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
         http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
 
@@ -45,10 +45,6 @@
 
     <mvc:default-servlet-handler/>
 
-    <!--
-	Provider of SpringApplication Context
-	Source: http://blog.jdevelop.eu/2008/07/06/access-the-spring-applicationcontext-from-everywhere-in-your-application/
-	-->
     <bean id="contextApplicationContextProvider" class="uk.ac.ebi.metabolights.webservice.services.ApplicationContextProvider"></bean>
 
     <!--  register the application properties -->
@@ -70,13 +66,12 @@
     <jee:jndi-lookup id="curatedMetaboliteListLocation" jndi-name="java:comp/env/curatedMetaboliteListLocation" />
     <jee:jndi-lookup id="uploadDirectory" jndi-name="java:comp/env/uploadDirectory" />
 
-    <!-- Private FTP Directory -->
+    <!-- Private upload Directory -->
     <jee:jndi-lookup id="privateFTPRoot" jndi-name="java:comp/env/privateFTPRoot" />
     <jee:jndi-lookup id="privateFTPServer" jndi-name="java:comp/env/privateFTPServer" />
     <jee:jndi-lookup id="privateFTPUser" jndi-name="java:comp/env/privateFTPUser" />
     <jee:jndi-lookup id="privateFTPPass" jndi-name="java:comp/env/privateFTPPass" />
     <jee:jndi-lookup id="linkFTPUploadDoc" jndi-name="java:comp/env/linkFTPUploadDoc" />
-
 
     <jee:jndi-lookup id="ondemand" jndi-name="java:comp/env/ondemand" />
     <jee:jndi-lookup id="chemspiderSecurityToken" jndi-name="java:comp/env/chemspiderSecurityToken"/>
@@ -99,12 +94,7 @@
     <jee:jndi-lookup id="OrcidLinkServiceURL" jndi-name="java:comp/env/OrcidLinkServiceURL"/>
     <jee:jndi-lookup id="OrcidRetreiveClaimsURL" jndi-name="java:comp/env/OrcidRetreiveClaimsURL"/>
 
-
-
-    <!--<jee:jndi-lookup id="mailpassword" jndi-name="java:comp/env/mailpassword"/>-->
-
     <bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
-
         <property name="host"><value>#{mailServer}</value></property>
 
         <!-- Gmail email settings -->
@@ -122,8 +112,12 @@
         <!-- End gmail settings-->
     </bean>
 
+    <!--bean id="velocityConfig" class="org.springframework.web.servlet.view.velocity.VelocityConfigurer">
+        <property name="resourceLoaderPath"><value>/WEB-INF/velocity/</value></property>
+    </bean-->
+
     <bean id="velocityEngine" class="org.springframework.ui.velocity.VelocityEngineFactoryBean">
-        <property name="velocityProperties">
+    <property name="velocityProperties">
             <value>
                 resource.loader=class
                 class.resource.loader.class=org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader
@@ -142,16 +136,13 @@
         <constructor-arg index="3" ref="stableIdPrefix"/>
     </bean>
 
-
     <bean id="userDAO"
           class="uk.ac.ebi.metabolights.repository.dao.hibernate.UserDAO"
           autowire="byName"
           factory-bean="DAOFactory"
           factory-method="getUserDAO"/>
 
-
     <import resource="spring-security.xml"/>
-
 
     <bean id="searchService" class="uk.ac.ebi.metabolights.search.service.imp.es.ElasticSearchService">
         <property name="studyPrefix" value="#{stableIdPrefix}"/>

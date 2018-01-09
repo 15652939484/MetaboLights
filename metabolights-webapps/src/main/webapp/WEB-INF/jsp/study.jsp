@@ -1178,7 +1178,7 @@
                                             <span id="aspDMF"></span>
                                         </c:if>
                                     </div>
-                                    <sec:authorize ifAnyGranted="ROLE_SUPER_USER">
+                                    <sec:authorize access="hasAnyRole('ROLE_SUPER_USER')">
                                         <div style="float: right; padding: 10px;">
                                             <input data-delete="${pageContext.request.contextPath}/${study.studyIdentifier}/files/deleteSelFiles"
                                                    data-download="${pageContext.request.contextPath}/${study.studyIdentifier}/files/downloadSelFiles"
@@ -1196,7 +1196,7 @@
                                 <div class="ui-state-highlight ui-corner-all">
                                     <p><strong>Info:</strong><spring:message code="label.fileListTableInstructions"/>
                                     </p>
-                                    <sec:authorize ifAnyGranted="ROLE_SUPER_USER">
+                                    <sec:authorize access="hasAnyRole('ROLE_SUPER_USER')">
                                         <p><spring:message code="label.fileListTableDelInstructions"/></p>
                                     </sec:authorize>
                                 </div>

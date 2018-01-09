@@ -85,7 +85,7 @@ public class ReferenceLayerImporter {
 		if (chebiWS == null)
 			try {
 				LOGGER.info("Starting a new instance of the ChEBI webservice");
-				chebiWS = new ChebiWebServiceClient(new URL("http://www.ebi.ac.uk/webservices/chebi/2.0/webservice?wsdl"),new QName("http://www.ebi.ac.uk/webservices/chebi", "ChebiWebServiceService"));
+				chebiWS = new ChebiWebServiceClient(new URL("https://www.ebi.ac.uk/webservices/chebi/2.0/webservice?wsdl"),new QName("https://www.ebi.ac.uk/webservices/chebi", "ChebiWebServiceService"));
 			} catch (MalformedURLException e) {
 				LOGGER.error("Error instantiating a new ChebiWebServiceClient " + e.getMessage());
 			}

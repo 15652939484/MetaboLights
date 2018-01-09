@@ -49,7 +49,7 @@
 				<tiles:insertAttribute name="localheader" />
 			</header>
 			<div id="content" role="main" class="grid_24 clearfix">
-		 		<tiles:useAttribute name="noBreadCrumb" ignore="true"/>
+		 		<tiles:importAttribute name="noBreadCrumb" ignore="true"/>
 				<c:if test="${empty noBreadCrumb}">
 					<nav id="breadcrumb">
 						<p>
