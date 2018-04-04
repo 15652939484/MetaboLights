@@ -63,6 +63,7 @@ public class DescriptionConstants {
 
 
     public static final String ISATAB_INVESTIGATION = "ISA-Tab investigation file check";
+    public static final String ISATAB_CONFIGURATION = "MetaboLights ISA configuration check";
 
 
     //OTHER

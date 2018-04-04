@@ -21,6 +21,7 @@ public class StudyValidationUtilities {
         if (!hasInvalidIsaTab(study)) {
             validationsFromDB = study.getValidations();
             validateStudy(study,studiesFolder);
+            retainIsaConfigValidation(validationsFromDB,study);
             checkForOverriding(validationsFromDB, study.getValidations());
         }
         Status status = Utilities.checkOverallStatus(study.getValidations().getEntries());
@@ -100,6 +101,14 @@ public class StudyValidationUtilities {
             }
         }
 
+    }
+
+    private static void retainIsaConfigValidation(Validations fromDB, Study study) {
+        for(Validation validation : fromDB.getEntries()){
+            if(validation.getId().equals(120)){
+                study.getValidations().getEntries().add(validation);
+            }
+        }
     }
 
 

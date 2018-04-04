@@ -21,7 +21,9 @@
 
 package uk.ac.ebi.metabolights.repository.utils;
 
+import org.apache.commons.collections15.OrderedMap;
 import org.isatools.isacreator.configuration.FieldObject;
+import org.isatools.isacreator.gui.reference.DataEntryReferenceObject;
 import org.isatools.isacreator.model.Factor;
 import org.isatools.isacreator.model.Investigation;
 import org.isatools.isacreator.model.StudyDesign;
@@ -33,6 +35,8 @@ import uk.ac.ebi.metabolights.repository.model.*;
 import uk.ac.ebi.metabolights.repository.model.studyvalidator.Group;
 import uk.ac.ebi.metabolights.repository.model.studyvalidator.Requirement;
 import uk.ac.ebi.metabolights.repository.model.studyvalidator.Validation;
+import uk.ac.ebi.metabolights.repository.model.studyvalidator.ValidationIdentifier;
+import uk.ac.ebi.metabolights.repository.utils.validation.DescriptionConstants;
 
 import java.io.File;
 import java.text.ParseException;
@@ -95,6 +99,13 @@ public class IsaTab2MetaboLightsConverter {
         // Get the first and unique study
         org.isatools.isacreator.model.Study isaStudy = source.getStudies().values().iterator().next();
 
+        OrderedMap<String, String> fieldValues = source.getFieldValues();
+        if(fieldValues!=null || fieldValues.isEmpty()){
+            for(Map.Entry<String, String> entry : fieldValues.entrySet()){
+               isaStudy.getFieldValues().put(entry.getKey(),entry.getValue());
+            }
+        }
+
         IsaTabReplacer isaTabIdReplacer = new IsaTabReplacer(new File(studyFolder).getAbsolutePath());
 
         try {
@@ -153,6 +164,9 @@ public class IsaTab2MetaboLightsConverter {
 
         //Organism and Organism part
         studyToFill.setOrganism(sampleOrg2organism(studyToFill));
+
+        //Validate config used
+        validateIsaConfigUsed(studyToFill,isaStudy);
 
         return studyToFill;
     }
@@ -521,4 +535,30 @@ public class IsaTab2MetaboLightsConverter {
 
         return isaTabDateFormat.format(date.getTime());
     }
-}
+
+    public static void validateIsaConfigUsed(Study studyToFill, org.isatools.isacreator.model.Study isaStudy){
+        Validation validation = new Validation(DescriptionConstants.ISATAB_CONFIGURATION, Requirement.MANDATORY, Group.ISATAB);
+        validation.setId(ValidationIdentifier.ISATAB_CONFIGURATION.getID());
+
+        String isaConfigUsed = "";
+
+        OrderedMap<String, String> fieldValues = isaStudy.getFieldValues();
+
+        for(Map.Entry<String, String> entry : fieldValues.entrySet()){
+            if(entry.getKey().equals("Comment[Created With Configuration]")){
+                isaConfigUsed = entry.getValue();
+                break;
+            }
+        }
+        if(isaConfigUsed != null && !isaConfigUsed.isEmpty()){
+             if(isaConfigUsed.contains("isaconfig-default_")){
+                  String[] values = isaConfigUsed.split("isaconfig-default_");
+                  validation.setPassedRequirement(false);
+                  validation.setMessage("This study has been created using ISAcreator's default configuration (isaconfig-default_"+ values[values.length -1] + "). " +
+                          "This is not a recommended MetaboLights configuration and the study may be missing required columns and fields.");
+             }
+        }
+        studyToFill.getValidations().getEntries().add(validation);
+    }
+
+    }
