@@ -68,12 +68,12 @@ public class IsaTab2MetaboLightsConverter {
     private static final String CHARACTERISTICS_ORGANISM = "characteristics[organism]";
     private static final String CHARACTERISTICS_ORGANISM_PART = "characteristics[organism part]";
 
-	// To improve assay conversion performance...
-	private static List<String[]> currentAssaySpreadsheet;
-	private static String currentAssayName = "";
+    // To improve assay conversion performance...
+    private static List<String[]> currentAssaySpreadsheet;
+    private static String currentAssayName = "";
 
 
-	public static Study convert(Investigation investigation, String studyFolder, boolean includeMetabolites, Study studyToFill){
+    public static Study convert(Investigation investigation, String studyFolder, boolean includeMetabolites, Study studyToFill) {
 
         // Convert the study from the ISAcreator model...
         Study metStudy = isaTabInvestigation2MetaboLightsStudy(investigation, studyFolder, includeMetabolites, studyToFill);
@@ -85,10 +85,11 @@ public class IsaTab2MetaboLightsConverter {
 
     /**
      * Reads and maps the MAF to a MetaboliteAssignment class
+     *
      * @param fileName
      * @return MetaboliteAssignment with metabolite data
      */
-    private static MetaboliteAssignment getMAF(String fileName){
+    private static MetaboliteAssignment getMAF(String fileName) {
         //Fully qualified file name, incl path!
         return mzTabDAO.mapMetaboliteAssignmentFile(fileName);
     }
@@ -100,9 +101,9 @@ public class IsaTab2MetaboLightsConverter {
         org.isatools.isacreator.model.Study isaStudy = source.getStudies().values().iterator().next();
 
         OrderedMap<String, String> fieldValues = source.getFieldValues();
-        if(fieldValues!=null || fieldValues.isEmpty()){
-            for(Map.Entry<String, String> entry : fieldValues.entrySet()){
-               isaStudy.getFieldValues().put(entry.getKey(),entry.getValue());
+        if (fieldValues != null || fieldValues.isEmpty()) {
+            for (Map.Entry<String, String> entry : fieldValues.entrySet()) {
+                isaStudy.getFieldValues().put(entry.getKey(), entry.getValue());
             }
         }
 
@@ -116,15 +117,13 @@ public class IsaTab2MetaboLightsConverter {
 
                 }
             }
-        }
-        catch(Exception e){
+        } catch (Exception e) {
 
             studyToFill.getIsatabErrorMessages().add(e.getMessage());
         }
 
         // Populate direct study members
-        if (studyToFill.getStudyIdentifier() == null || studyToFill.getStudyIdentifier().isEmpty())
-        {
+        if (studyToFill.getStudyIdentifier() == null || studyToFill.getStudyIdentifier().isEmpty()) {
             studyToFill.setStudyIdentifier(isaStudy.getStudyId());
         }
         studyToFill.setTitle(isaStudy.getStudyTitle());
@@ -133,11 +132,10 @@ public class IsaTab2MetaboLightsConverter {
 
 
         // Public release date (prioritise DB)
-        studyToFill.setStudyPublicReleaseDate(chooseDate(studyToFill.getStudyPublicReleaseDate(),isaStudy.getPublicReleaseDate(),"Release date", studyToFill));
+        studyToFill.setStudyPublicReleaseDate(chooseDate(studyToFill.getStudyPublicReleaseDate(), isaStudy.getPublicReleaseDate(), "Release date", studyToFill));
 
         // Submission date..(prioritise DB)
         studyToFill.setStudySubmissionDate(chooseDate(studyToFill.getStudySubmissionDate(), isaStudy.getDateOfSubmission(), "Submission date", studyToFill));
-
 
 
         // Now collections
@@ -166,13 +164,13 @@ public class IsaTab2MetaboLightsConverter {
         studyToFill.setOrganism(sampleOrg2organism(studyToFill));
 
         //Validate config used
-        validateIsaConfigUsed(studyToFill,isaStudy);
+        validateIsaConfigUsed(studyToFill, isaStudy);
 
         return studyToFill;
     }
 
 
-    private static Date chooseDate(Date firstOption, String secondOption, String field, Study studyToFill){
+    private static Date chooseDate(Date firstOption, String secondOption, String field, Study studyToFill) {
 
         Validation validation = new Validation(field + " synchronization", Requirement.OPTIONAL, Group.ISATAB);
 
@@ -188,10 +186,10 @@ public class IsaTab2MetaboLightsConverter {
             validation.setPassedRequirement(false);
             chosenOne = isaTabDate2Date(secondOption);
 
-        // If second option does not match the first one....
+            // If second option does not match the first one....
         } else if (!secondOption.equals(date2IsaTabDate(firstOption))) {
-                validation.setMessage(studyToFill.getStudyIdentifier() + " " + field + " from the DB (" + firstOption + ") doesn't match the same in the file (" + secondOption + ")");
-                validation.setPassedRequirement(false);
+            validation.setMessage(studyToFill.getStudyIdentifier() + " " + field + " from the DB (" + firstOption + ") doesn't match the same in the file (" + secondOption + ")");
+            validation.setPassedRequirement(false);
 
         } else {
             validation.setMessage(studyToFill.getStudyIdentifier() + " " + field + " from the DB (" + firstOption + ") matches the same in the file (" + secondOption + ")");
@@ -210,31 +208,31 @@ public class IsaTab2MetaboLightsConverter {
         Set<Organism> organisms = new HashSet<Organism>();
         List<String> sampleDeDuplication = new ArrayList<String>();
 
-		// NOw, using a multimap we are getting a set instead but there should be only one field
+        // NOw, using a multimap we are getting a set instead but there should be only one field
 //		Field organismField = metStudy.getSampleTable().getFields().get(CHARACTERISTICS_ORGANISM);
 //		Field organismPartField = metStudy.getSampleTable().getFields().get(CHARACTERISTICS_ORGANISM_PART);
-		Field organismField = getFieldByName(metStudy.getSampleTable(), CHARACTERISTICS_ORGANISM);
-		Field organismPartField = getFieldByName(metStudy.getSampleTable(),CHARACTERISTICS_ORGANISM_PART);
+        Field organismField = getFieldByName(metStudy.getSampleTable(), CHARACTERISTICS_ORGANISM);
+        Field organismPartField = getFieldByName(metStudy.getSampleTable(), CHARACTERISTICS_ORGANISM_PART);
 
 
-		// If both field are null...exit with an empty collection
-		if (organismField == null && organismPartField == null) return organisms;
+        // If both field are null...exit with an empty collection
+        if (organismField == null && organismPartField == null) return organisms;
 
 
-        for (Row sample: metStudy.getSampleTable()) {
-			Organism organism = new Organism();
+        for (Row sample : metStudy.getSampleTable()) {
+            Organism organism = new Organism();
 
-			if (organismField != null) {
-				organism.setOrganismName(sample.getValues().get(organismField.getIndex()));
-			} else {
-				logger.warn(CHARACTERISTICS_ORGANISM + " column not found in " + metStudy.getStudyLocation());
-			}
+            if (organismField != null) {
+                organism.setOrganismName(sample.getValues().get(organismField.getIndex()));
+            } else {
+                logger.warn(CHARACTERISTICS_ORGANISM + " column not found in " + metStudy.getStudyLocation());
+            }
 
-			if (organismPartField != null){
-				organism.setOrganismPart(sample.getValues().get(organismPartField.getIndex()));
-			} else {
-				logger.warn(CHARACTERISTICS_ORGANISM_PART + " column not found in " + metStudy.getStudyLocation());
-			}
+            if (organismPartField != null) {
+                organism.setOrganismPart(sample.getValues().get(organismPartField.getIndex()));
+            } else {
+                logger.warn(CHARACTERISTICS_ORGANISM_PART + " column not found in " + metStudy.getStudyLocation());
+            }
 
             if (!sampleDeDuplication.contains(organism.getOrganismName())) {
                 organisms.add(organism);
@@ -245,13 +243,13 @@ public class IsaTab2MetaboLightsConverter {
     }
 
 
-    private static Collection<Contact> isaTabContacts2MetaboLightsContacts(org.isatools.isacreator.model.Study isaStudy){
+    private static Collection<Contact> isaTabContacts2MetaboLightsContacts(org.isatools.isacreator.model.Study isaStudy) {
 
         List<org.isatools.isacreator.model.Contact> isaContacts = isaStudy.getContacts();
 
         List<Contact> contacts = new LinkedList<Contact>();
 
-        for (org.isatools.isacreator.model.Contact isaContact: isaContacts){
+        for (org.isatools.isacreator.model.Contact isaContact : isaContacts) {
             Contact contact = new Contact();
 
             contact.setAddress(isaContact.getAddress());
@@ -271,13 +269,13 @@ public class IsaTab2MetaboLightsConverter {
 
     }
 
-    private static Collection<StudyDesignDescriptors> isaTabStudyDesign2MetaboLightsStudiesDesignDescriptors(org.isatools.isacreator.model.Study isaStudy){
+    private static Collection<StudyDesignDescriptors> isaTabStudyDesign2MetaboLightsStudiesDesignDescriptors(org.isatools.isacreator.model.Study isaStudy) {
 
         List<StudyDesign> isaStudyDesigns = isaStudy.getStudyDesigns();
 
         List<StudyDesignDescriptors> descriptors = new LinkedList<StudyDesignDescriptors>();
 
-        for (StudyDesign isaStudyDesign: isaStudyDesigns){
+        for (StudyDesign isaStudyDesign : isaStudyDesigns) {
 
             StudyDesignDescriptors descriptor = new StudyDesignDescriptors();
             descriptor.setDescription(isaStudyDesign.getIdentifier());
@@ -289,13 +287,13 @@ public class IsaTab2MetaboLightsConverter {
     }
 
 
-    private static Collection<StudyFactor> isaTabStudyFactors2MetaboLightsStudyFactors(org.isatools.isacreator.model.Study isaStudy){
+    private static Collection<StudyFactor> isaTabStudyFactors2MetaboLightsStudyFactors(org.isatools.isacreator.model.Study isaStudy) {
 
         List<Factor> isaFactors = isaStudy.getFactors();
 
         List<StudyFactor> studyFactors = new LinkedList<StudyFactor>();
 
-        for (Factor isaFactor : isaFactors){
+        for (Factor isaFactor : isaFactors) {
             StudyFactor studyFactor = new StudyFactor();
             studyFactor.setName(isaFactor.getFactorName());
             studyFactors.add(studyFactor);
@@ -305,22 +303,22 @@ public class IsaTab2MetaboLightsConverter {
 
     }
 
-    private static Table isaTabSamples2MetabolightsSamples(org.isatools.isacreator.model.Study isaStudy, Study metStudy){
+    private static Table isaTabSamples2MetabolightsSamples(org.isatools.isacreator.model.Study isaStudy, Study metStudy) {
 
         List<List<String>> isaSamplesData = isaStudy.getStudySample().getTableReferenceObject().getReferenceData().getData();
 
-		// Create the sample table object
-		Table sampleTable = new Table(isaSamplesData,  getTableFieldsMap(isaStudy.getStudySample()));
-		metStudy.setSampleTable(sampleTable);
+        // Create the sample table object
+        Table sampleTable = new Table(isaSamplesData, getTableFieldsMap(isaStudy.getStudySample()));
+        metStudy.setSampleTable(sampleTable);
 
         return sampleTable;
     }
 
-    private static Field getFieldByName(Table table, String name){
+    private static Field getFieldByName(Table table, String name) {
 
-        for (String key: table.getFields().keySet()){
+        for (String key : table.getFields().keySet()) {
 
-            if (key.contains(FIELDS_KEY_SEP + name)){
+            if (key.contains(FIELDS_KEY_SEP + name)) {
                 return table.getFields().get(key);
             }
 
@@ -328,101 +326,102 @@ public class IsaTab2MetaboLightsConverter {
 
         return null;
     }
-	private static void fillMetaboliteAssignmentFile(Assay metAssay, Study metStudy){
 
-		//Field mafColumnField = metAssay.getAssayTable().getFields().get(METABOLITE_ASSIGNMENT_FILE);
-        Field mafColumnField = getFieldByName(metAssay.getAssayTable(),METABOLITE_ASSIGNMENT_FILE);
+    private static void fillMetaboliteAssignmentFile(Assay metAssay, Study metStudy) {
 
-		// If column not present
-		if (mafColumnField == null) {
-			logger.warn(METABOLITE_ASSIGNMENT_FILE + " column not found in file: " + metAssay.getFileName());
-			return;
-		}
+        //Field mafColumnField = metAssay.getAssayTable().getFields().get(METABOLITE_ASSIGNMENT_FILE);
+        Field mafColumnField = getFieldByName(metAssay.getAssayTable(), METABOLITE_ASSIGNMENT_FILE);
 
-		for(Row assayLine:metAssay.getAssayTable()){
+        // If column not present
+        if (mafColumnField == null) {
+            logger.warn(METABOLITE_ASSIGNMENT_FILE + " column not found in file: " + metAssay.getFileName());
+            return;
+        }
 
-			String mafValue = assayLine.getValues().get(mafColumnField.getIndex());
+        for (Row assayLine : metAssay.getAssayTable()) {
 
-			// If not empty or null
-			if (mafValue!= null && !mafValue.equals("")){
+            String mafValue = assayLine.getValues().get(mafColumnField.getIndex());
 
-				String mafFileName = metStudy.getStudyLocation() + File.separator + mafValue;
+            // If not empty or null
+            if (mafValue != null && !mafValue.equals("")) {
 
-				File mafFile = new File(mafFileName);
+                String mafFileName = metStudy.getStudyLocation() + File.separator + mafValue;
 
-				if(mafFile.exists()){
-					metAssay.getMetaboliteAssignment().setMetaboliteAssignmentFileName(mafFileName);
-					return;
-				} else {
-					logger.warn("Identification file reported not present: " + mafFileName);
-				}
-			}
-		}
+                File mafFile = new File(mafFileName);
 
-	}
+                if (mafFile.exists()) {
+                    metAssay.getMetaboliteAssignment().setMetaboliteAssignmentFileName(mafFileName);
+                    return;
+                } else {
+                    logger.warn("Identification file reported not present: " + mafFileName);
+                }
+            }
+        }
 
-	// Returns a map to get the value in an assay line based on the name
-	private static LinkedHashMap<String,Field> getTableFieldsMap(org.isatools.isacreator.model.Assay assay){
+    }
 
-		LinkedHashMap<String,Field> tableFieldsMap = new LinkedHashMap();
+    // Returns a map to get the value in an assay line based on the name
+    private static LinkedHashMap<String, Field> getTableFieldsMap(org.isatools.isacreator.model.Assay assay) {
+
+        LinkedHashMap<String, Field> tableFieldsMap = new LinkedHashMap();
 
         // First header is the row number...don't want that.
-		Integer index = -1;
+        Integer index = -1;
 
-		for (String header :  assay.getTableReferenceObject().getPreDefinedHeaders()){
+        for (String header : assay.getTableReferenceObject().getPreDefinedHeaders()) {
 
-			if (index>-1) {
+            if (index > -1) {
 
-				FieldObject isaField = assay.getTableReferenceObject().getFieldByName(header);
+                FieldObject isaField = assay.getTableReferenceObject().getFieldByName(header);
 
-				Field newField = isaField2Field(header,index, isaField);
+                Field newField = isaField2Field(header, index, isaField);
 
-				tableFieldsMap.put(index + FIELDS_KEY_SEP + header.toLowerCase(), newField);
+                tableFieldsMap.put(index + FIELDS_KEY_SEP + header.toLowerCase(), newField);
 
-			}
+            }
 
-			index++;
-
-
-		}
+            index++;
 
 
-		return tableFieldsMap;
-
-	}
-
-	private static Field isaField2Field(String isaFieldHeader, Integer index, FieldObject isaField) {
+        }
 
 
-		// Parse the header
-		// Header can come with Field type [ xxx ] or plain...there are some cases with () but ignoring them so far.
-		String header = isaFieldHeader;
+        return tableFieldsMap;
 
-		// Dafault type to basic
-		String type = "basic";
+    }
 
-		if (header.contains("[")){
-			String[] headerChunks = header.split("\\[|\\]");
-			header = headerChunks[1];
-			type = headerChunks[0];
-		}
-
-		Field field = new Field(header, index,type);
-
-		// Fill the description
-		if (isaField != null)
-			field.setDescription(isaField.getDescription());
-
-		field.setCleanHeader(header);
+    private static Field isaField2Field(String isaFieldHeader, Integer index, FieldObject isaField) {
 
 
-		// Return the field
-		return  field;
+        // Parse the header
+        // Header can come with Field type [ xxx ] or plain...there are some cases with () but ignoring them so far.
+        String header = isaFieldHeader;
+
+        // Dafault type to basic
+        String type = "basic";
+
+        if (header.contains("[")) {
+            String[] headerChunks = header.split("\\[|\\]");
+            header = headerChunks[1];
+            type = headerChunks[0];
+        }
+
+        Field field = new Field(header, index, type);
+
+        // Fill the description
+        if (isaField != null)
+            field.setDescription(isaField.getDescription());
+
+        field.setCleanHeader(header);
 
 
-	}
+        // Return the field
+        return field;
 
-    private static List<Assay> isaTabAssays2MetabolightsAssays(org.isatools.isacreator.model.Study isaStudy, Study metStudy, boolean includeMetabolites){
+
+    }
+
+    private static List<Assay> isaTabAssays2MetabolightsAssays(org.isatools.isacreator.model.Study isaStudy, Study metStudy, boolean includeMetabolites) {
 
         Map<String, org.isatools.isacreator.model.Assay> isaAssays = isaStudy.getAssays();
 
@@ -430,7 +429,7 @@ public class IsaTab2MetaboLightsConverter {
 
         int i = 1;
 
-        for(Map.Entry<String, org.isatools.isacreator.model.Assay> isaAssayEntry: isaAssays.entrySet() ){
+        for (Map.Entry<String, org.isatools.isacreator.model.Assay> isaAssayEntry : isaAssays.entrySet()) {
 
             org.isatools.isacreator.model.Assay isaAssay = isaAssayEntry.getValue();
 
@@ -446,21 +445,21 @@ public class IsaTab2MetaboLightsConverter {
 
             metAssay.setAssayNumber(i); //To enable a simpler URL structure like "MTBLS1/assay/1 or MTBLS2/assay/2
 
-			// Create the assay table object
-			Table assayTable = new Table(isaAssay.getTableReferenceObject().getReferenceData().getData(), getTableFieldsMap(isaAssay));
-			metAssay.setAssayTable(assayTable);
+            // Create the assay table object
+            Table assayTable = new Table(isaAssay.getTableReferenceObject().getReferenceData().getData(), getTableFieldsMap(isaAssay));
+            metAssay.setAssayTable(assayTable);
 
-			// Look for the maf file
-			fillMetaboliteAssignmentFile(metAssay, metStudy);
+            // Look for the maf file
+            fillMetaboliteAssignmentFile(metAssay, metStudy);
 
             // Add the metabolite assignment file (MAF)
             if (includeMetabolites)
                 metAssay.setMetaboliteAssignment(
-                    getMAF(metAssay.getMetaboliteAssignment().getMetaboliteAssignmentFileName()));
+                        getMAF(metAssay.getMetaboliteAssignment().getMetaboliteAssignmentFileName()));
 
             assays.add(metAssay);
 
-			i++;
+            i++;
         }
 
         return assays;
@@ -468,25 +467,25 @@ public class IsaTab2MetaboLightsConverter {
     }
 
     // Cleans the XXX: part of an ontologised field, if exists.
-    private static String removeOntology(String ontologisedValue){
+    private static String removeOntology(String ontologisedValue) {
         int colonPos = ontologisedValue.indexOf(":");
 
         // if not found return same value
         if (colonPos == -1) return ontologisedValue;
 
         // Else remove it
-        return ontologisedValue.substring(colonPos+1);
+        return ontologisedValue.substring(colonPos + 1);
 
 
     }
 
-    private static Collection<Publication> isaTabPublications2MetaboLightsPublications(org.isatools.isacreator.model.Study isaStudy){
+    private static Collection<Publication> isaTabPublications2MetaboLightsPublications(org.isatools.isacreator.model.Study isaStudy) {
 
         List<org.isatools.isacreator.model.Publication> isaPublications = isaStudy.getPublications();
 
         List<Publication> studyPublications = new LinkedList<Publication>();
 
-        for (org.isatools.isacreator.model.Publication isaPublication : isaPublications){
+        for (org.isatools.isacreator.model.Publication isaPublication : isaPublications) {
             Publication publication = new Publication();
 
             publication.setAbstractText(isaPublication.getAbstractText());
@@ -503,13 +502,13 @@ public class IsaTab2MetaboLightsConverter {
 
     }
 
-    private static Collection<Protocol> isaTabProtocols2MetaboLightsProtocols(org.isatools.isacreator.model.Study isaStudy){
+    private static Collection<Protocol> isaTabProtocols2MetaboLightsProtocols(org.isatools.isacreator.model.Study isaStudy) {
 
         List<org.isatools.isacreator.model.Protocol> isaStudyProtocols = isaStudy.getProtocols();
 
         List<Protocol> studyProtocols = new LinkedList<Protocol>();
 
-        for (org.isatools.isacreator.model.Protocol isaProtocol : isaStudyProtocols){
+        for (org.isatools.isacreator.model.Protocol isaProtocol : isaStudyProtocols) {
             Protocol protocol = new Protocol();
 
             protocol.setName(isaProtocol.getProtocolName());
@@ -522,7 +521,8 @@ public class IsaTab2MetaboLightsConverter {
         return studyProtocols;
 
     }
-    public static Date isaTabDate2Date (String isaTabDate){
+
+    public static Date isaTabDate2Date(String isaTabDate) {
 
         try {
             return isaTabDateFormat.parse(isaTabDate);
@@ -536,7 +536,7 @@ public class IsaTab2MetaboLightsConverter {
         return isaTabDateFormat.format(date.getTime());
     }
 
-    public static void validateIsaConfigUsed(Study studyToFill, org.isatools.isacreator.model.Study isaStudy){
+    public static void validateIsaConfigUsed(Study studyToFill, org.isatools.isacreator.model.Study isaStudy) {
         Validation validation = new Validation(DescriptionConstants.ISATAB_CONFIGURATION, Requirement.MANDATORY, Group.ISATAB);
         validation.setId(ValidationIdentifier.ISATAB_CONFIGURATION.getID());
 
@@ -544,21 +544,42 @@ public class IsaTab2MetaboLightsConverter {
 
         OrderedMap<String, String> fieldValues = isaStudy.getFieldValues();
 
-        for(Map.Entry<String, String> entry : fieldValues.entrySet()){
-            if(entry.getKey().equals("Comment[Created With Configuration]")){
+        for (Map.Entry<String, String> entry : fieldValues.entrySet()) {
+            if (entry.getKey().equals("Comment[Created With Configuration]")) {
                 isaConfigUsed = entry.getValue();
                 break;
             }
         }
-        if(isaConfigUsed != null && !isaConfigUsed.isEmpty()){
-             if(isaConfigUsed.contains("isaconfig-default_")){
-                  String[] values = isaConfigUsed.split("isaconfig-default_");
-                  validation.setPassedRequirement(false);
-                  validation.setMessage("This study has been created using ISAcreator's default configuration (isaconfig-default_"+ values[values.length -1] + "). " +
-                          "This is not a recommended MetaboLights configuration and the study may be missing required columns and fields.");
-             }
+        if (isaConfigUsed != null && !isaConfigUsed.isEmpty()) {
+            if (isaConfigUsed.contains("isaconfig-default_")) {
+                String[] values = isaConfigUsed.split("isaconfig-default_");
+                validation.setPassedRequirement(false);
+                validation.setMessage("This study has been created using ISAcreator's default configuration (isaconfig-default_" + values[values.length - 1] + "). " +
+                        "This is not a recommended MetaboLights configuration and the study may be missing required columns and fields.");
+            }
         }
-        studyToFill.getValidations().getEntries().add(validation);
-    }
+        if(studyToFill.getValidations().getEntries().size() > 0){
+            for (Validation validationFromDB : studyToFill.getValidations().getEntries()) {
+                if (validationFromDB.getId().equals(120)) {
+                    if (!validation.getPassedRequirement()) {
+                        boolean overRiddenValue = validationFromDB.getPassedRequirement();
+                        boolean currentValue = validation.getPassedRequirement();
+                        if (overRiddenValue != currentValue) {
+                          //  validation.setPassedRequirement(overRiddenValue);
+                            validationFromDB.setOverriden(true);
+                        }
+                    } else{
+                        validationFromDB.setPassedRequirement(validation.getPassedRequirement());
+                        validationFromDB.setMessage(validation.getMessage());
+                        validationFromDB.setOverriden(false);
+                    }
+                }
+            }
+        }else{
+            studyToFill.getValidations().getEntries().add(validation);
+        }
+
 
     }
+
+}

@@ -21,9 +21,9 @@ public class StudyValidationUtilities {
         if (!hasInvalidIsaTab(study)) {
             validationsFromDB = study.getValidations();
             validateStudy(study,studiesFolder);
-            retainIsaConfigValidation(validationsFromDB,study);
             checkForOverriding(validationsFromDB, study.getValidations());
         }
+        retainIsaConfigValidation(validationsFromDB,study);
         Status status = Utilities.checkOverallStatus(study.getValidations().getEntries());
         study.getValidations().setStatus(status);
         study.getValidations().setPassedMinimumRequirement(Utilities.checkPassedMinimumRequirement(study.getValidations().getEntries()));
@@ -83,7 +83,7 @@ public class StudyValidationUtilities {
         study.getValidations().getEntries().add(exceptionValidation);
     }
 
-    private static void checkForOverriding(Validations fromDB, Validations generatedNow) {
+    public static void checkForOverriding(Validations fromDB, Validations generatedNow) {
         if (fromDB == null) {
             return;
         }
